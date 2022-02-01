@@ -1,0 +1,9 @@
+{
+  "name": "taskpad-2",
+  "version": "0.1.0",
+  "description": "This is a kind of a notepad but on the second try",
+  "main": "./build/index.js",
+  "repository": "https://github.com/syllomex/taskpad-2.git",
+  "author": "Leonardo Santos<leonardojdossantos@gmail.com>",
+  "license": "MIT"
+}
