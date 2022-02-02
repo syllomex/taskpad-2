@@ -2,8 +2,18 @@
   "name": "taskpad-2",
   "version": "0.1.0",
   "description": "This is a kind of a notepad but on the second try",
-  "main": "./build/index.js",
+  "main": "./dist/index.js",
   "repository": "https://github.com/syllomex/taskpad-2.git",
   "author": "Leonardo Santos<leonardojdossantos@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "compile": "tsc",
+    "start": "npm run compile && electron ./dist/index.js",
+    "dev": "concurrently \"cd ./src/view && npm run start\" \"wait-on http://localhost:3000 && npm run start\""
+  },
+  "devDependencies": {
+    "concurrently": "^7.0.0",
+    "electron": "^17.0.0",
+    "typescript": "^4.5.5"
+  }
 }
