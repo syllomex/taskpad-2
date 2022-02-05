@@ -11,6 +11,8 @@ export interface PadsContextType {
   setDropDirection: SetState<'up' | 'down' | null>
   mouseOverPadId: string | null
   setMouseOverPadId: SetState<string | null>
+  selectedPadId: string | null
+  setSelectedPadId: SetState<string | null>
 }
 
 export interface Item {

@@ -14,4 +14,5 @@ export const FloatingSpan = styled.span`
   padding: 8px;
 
   display: none;
+  user-select: none;
 `

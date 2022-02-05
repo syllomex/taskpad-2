@@ -31,10 +31,11 @@ export const Item: FC<{
     dropDirection,
     setDropDirection,
     setMouseOverPadId,
-    deletePad
+    deletePad,
+    selectPad,
+    selectedPadId
   } = usePads()
 
-  const isMoving = movingPadId === pad.id
   const isMovingOther = movingPadId && movingPadId !== pad.id
 
   useEffect(() => {
@@ -115,7 +116,7 @@ export const Item: FC<{
   }, [dropDirection, isMovingOther, movingOverPadId, movingPadId, pad.id, pads])
 
   const className = (() => {
-    if (isMoving) return 'moving'
+    if (selectedPadId === pad.id) return 'selected'
     return ''
   })()
 
@@ -183,6 +184,7 @@ export const Item: FC<{
       onMouseEnter={() => setMouseOverPadId(pad.id)}
       onMouseLeave={() => setMouseOverPadId(null)}
       onContextMenu={handleDeletePad}
+      onClick={() => selectPad(pad.id)}
     >
       <Circle className={className} />
     </CircleContainer>

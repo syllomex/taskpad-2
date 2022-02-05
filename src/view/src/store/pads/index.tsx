@@ -26,6 +26,7 @@ export const PadsProvider: FC = ({ children }) => {
   const [movingOverPadId, setMovingOverPadId] = useState<string | null>(null)
   const [dropDirection, setDropDirection] = useState<'up' | 'down' | null>(null)
   const [mouseOverPadId, setMouseOverPadId] = useState<string | null>(null)
+  const [selectedPadId, setSelectedPadId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!movingPadId) return
@@ -93,7 +94,9 @@ export const PadsProvider: FC = ({ children }) => {
         dropDirection,
         setDropDirection,
         mouseOverPadId,
-        setMouseOverPadId
+        setMouseOverPadId,
+        selectedPadId,
+        setSelectedPadId
       }}
     >
       {children}
@@ -107,8 +110,10 @@ export const usePads = () => {
   const { setPads } = context
 
   const createPad = useCallback(() => {
-    setPads((cur) => [...cur, { id: v4(), items: [], title: 'Nova página' }])
-  }, [setPads])
+    const id = v4()
+    setPads((cur) => [...cur, { id, items: [], title: 'Nova página' }])
+    context.setSelectedPadId(id)
+  }, [context, setPads])
 
   const deletePad = useCallback(
     (id: string) => {
@@ -117,5 +122,10 @@ export const usePads = () => {
     [setPads]
   )
 
-  return { ...context, createPad, deletePad }
+  return {
+    ...context,
+    createPad,
+    deletePad,
+    selectPad: context.setSelectedPadId
+  }
 }

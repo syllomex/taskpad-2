@@ -28,15 +28,6 @@ export const Container = styled.div`
       background-color: var(--color-primary-transparent-2);
     }
   }
-
-  .moving {
-  }
-
-  .up {
-  }
-
-  .down {
-  }
 `
 
 export const CircleContainer = styled.div`
@@ -67,5 +58,9 @@ export const Circle = styled.div`
   &:active {
     opacity: 0.4;
     background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  &.selected {
+    background-color: var(--color-primary);
   }
 `
