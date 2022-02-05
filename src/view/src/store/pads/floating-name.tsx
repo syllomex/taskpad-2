@@ -13,9 +13,11 @@ export const FloatingName: FC = () => {
     const listener = (ev: MouseEvent) => {
       if (!ref.current) return
 
-      const { clientY, clientX } = ev
+      const { clientX, clientY } = ev
+      const translateX = `${clientX + 16}px`
+      const translateY = `${clientY - 8}px`
 
-      ref.current.style.transform = `translate(${clientX + 16}px, ${clientY}px)`
+      ref.current.style.transform = `translate(${translateX}, ${translateY})`
     }
 
     document.addEventListener('mousemove', listener)
