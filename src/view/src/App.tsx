@@ -4,7 +4,7 @@ import { Main } from './components/Main'
 import { Menu } from './components/Menu'
 import { Wrapper } from './components/Wrapper'
 
-import { FloatingTextProvider, PadsProvider } from './store'
+import { FloatingTextProvider, PadProvider, PadsProvider } from './store'
 import { ConfirmProvider } from './store/confirm'
 
 const App: FC = () => {
@@ -12,10 +12,12 @@ const App: FC = () => {
     <FloatingTextProvider>
       <ConfirmProvider>
         <PadsProvider>
-          <Wrapper>
-            <Menu />
-            <Main />
-          </Wrapper>
+          <PadProvider>
+            <Wrapper>
+              <Menu />
+              <Main />
+            </Wrapper>
+          </PadProvider>
         </PadsProvider>
       </ConfirmProvider>
     </FloatingTextProvider>

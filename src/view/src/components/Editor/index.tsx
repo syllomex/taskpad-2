@@ -1,5 +1,6 @@
 import { FC } from 'react'
 import { usePad } from '../../store/pad'
+import { Content } from './content'
 import { Container } from './styles'
 import { Title } from './title'
 
@@ -11,6 +12,7 @@ export const Editor: FC = () => {
   return (
     <Container>
       <Title />
+      <Content />
     </Container>
   )
 }
