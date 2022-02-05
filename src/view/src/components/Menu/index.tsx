@@ -1,0 +1,260 @@
+import {
+  DragEvent,
+  FC,
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
+import { Pad, usePads } from '../../store'
+
+import { Circle, CircleContainer, Container } from './styles'
+
+export const Item: FC<{
+  pad: Pad
+  onRequestScroll(direction: 'up' | 'down' | null): void
+  scrollY: MutableRefObject<number>
+}> = ({ pad, onRequestScroll, scrollY }) => {
+  const ref = useRef<HTMLDivElement>(null)
+
+  const {
+    pads,
+    movingPadId,
+    setMovingPadId,
+    movingOverPadId,
+    setMovingOverPadId,
+    dropDirection,
+    setDropDirection,
+    setMouseOverPadId
+  } = usePads()
+
+  const isMoving = movingPadId === pad.id
+  const isMovingOther = movingPadId && movingPadId !== pad.id
+
+  useEffect(() => {
+    if (!ref.current) return
+    if (!movingPadId) {
+      ref.current.style.transform = 'translateY(0px)'
+    }
+
+    const mouseOverIndex = pads.findIndex(({ id }) => id === movingOverPadId)
+    const movingIndex = pads.findIndex(({ id }) => id === movingPadId)
+    const currentCircleIndex = pads.findIndex(({ id }) => id === pad.id)
+
+    const shouldDropAbove = dropDirection === 'up'
+    const shouldDropBelow = dropDirection === 'down'
+
+    if (mouseOverIndex === -1) {
+      return
+    } else if (mouseOverIndex === movingIndex - 1 && shouldDropBelow) {
+      return
+    } else if (mouseOverIndex === movingIndex + 1 && shouldDropAbove) {
+      return
+    }
+
+    if (currentCircleIndex === movingIndex) {
+      // MOVE THE CIRCLE TO ANOTHER POSITIONS
+      if (mouseOverIndex < movingIndex && shouldDropAbove) {
+        const diff = movingIndex - mouseOverIndex
+        ref.current.style.transform = `translateY(-${diff * 40}px)`
+      } else if (mouseOverIndex < movingIndex && shouldDropBelow) {
+        const diff = movingIndex - mouseOverIndex
+        ref.current.style.transform = `translateY(-${(diff - 1) * 40}px)`
+      } else if (mouseOverIndex > movingIndex && shouldDropBelow) {
+        const diff = mouseOverIndex - movingIndex
+        ref.current.style.transform = `translateY(${diff * 40}px)`
+      } else if (mouseOverIndex > movingIndex && shouldDropAbove) {
+        const diff = mouseOverIndex - movingIndex
+        ref.current.style.transform = `translateY(${(diff - 1) * 40}px)`
+      }
+    } else {
+      // MOVING CIRCLE UP
+      if (currentCircleIndex < movingIndex) {
+        if (shouldDropAbove) {
+          if (currentCircleIndex > mouseOverIndex - 1) {
+            ref.current.style.transform = 'translateY(40px)'
+          } else {
+            ref.current.style.transform = 'translateY(0px)'
+          }
+        } else if (shouldDropBelow) {
+          if (currentCircleIndex > mouseOverIndex) {
+            ref.current.style.transform = 'translateY(40px)'
+          } else {
+            ref.current.style.transform = 'translateY(0px)'
+          }
+        } else {
+          ref.current.style.transform = 'translateY(0px)'
+        }
+      } else if (currentCircleIndex > movingIndex) {
+        // MOVING CIRCLE DOWN
+        if (shouldDropBelow) {
+          if (currentCircleIndex < mouseOverIndex + 1) {
+            ref.current.style.transform = 'translateY(-40px)'
+          } else {
+            ref.current.style.transform = 'translateY(0px)'
+          }
+        } else if (shouldDropAbove) {
+          if (currentCircleIndex < mouseOverIndex) {
+            ref.current.style.transform = 'translateY(-40px)'
+          } else {
+            ref.current.style.transform = 'translateY(0px)'
+          }
+        } else {
+          ref.current.style.transform = 'translateY(0px)'
+        }
+      } else {
+        ref.current.style.transform = 'translateY(0px)'
+      }
+    }
+  }, [dropDirection, isMovingOther, movingOverPadId, movingPadId, pad.id, pads])
+
+  const className = (() => {
+    if (isMoving) return 'moving'
+    return ''
+  })()
+
+  const onMouseMove = useMemo(() => {
+    if (!movingPadId) return undefined
+
+    return (e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault()
+      if (!movingPadId) return
+      if (movingPadId === pad.id) return
+
+      const { clientY, currentTarget } = e
+
+      const scrollThreshold = 50
+
+      if (clientY < scrollThreshold) {
+        onRequestScroll('up')
+      } else if (clientY > document.body.clientHeight - scrollThreshold) {
+        onRequestScroll('down')
+      } else {
+        onRequestScroll(null)
+      }
+
+      const circleCenter =
+        currentTarget.offsetTop +
+        currentTarget.offsetHeight / 2 -
+        scrollY.current
+
+      if (clientY < circleCenter) {
+        setDropDirection('up')
+      } else {
+        setDropDirection('down')
+      }
+
+      setMovingOverPadId(pad.id)
+    }
+  }, [
+    movingPadId,
+    onRequestScroll,
+    pad.id,
+    scrollY,
+    setDropDirection,
+    setMovingOverPadId
+  ])
+
+  return (
+    <CircleContainer
+      ref={ref}
+      key={pad.id}
+      onMouseMove={onMouseMove}
+      className={movingPadId ? 'with-transition' : ''}
+      draggable
+      onDragStart={(e) => {
+        e.preventDefault()
+        setMovingPadId(pad.id)
+      }}
+      onMouseEnter={() => setMouseOverPadId(pad.id)}
+      onMouseLeave={() => setMouseOverPadId(null)}
+    >
+      <Circle
+        className={className}
+        style={{ backgroundColor: `#${pad.id}66` }}
+      />
+    </CircleContainer>
+  )
+}
+
+export const Menu: FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const { pads, movingPadId, setMovingOverPadId, setDropDirection } = usePads()
+  const [scrollDirection, setScrollDirection] = useState<'up' | 'down' | null>(
+    null
+  )
+  const scrollY = useRef(0)
+
+  const handleScroll = useCallback((direction: 'up' | 'down' | null) => {
+    if (!containerRef.current) return
+
+    if (!direction) return setScrollDirection(null)
+
+    const { scrollTop, clientHeight, scrollHeight } = containerRef.current
+
+    const minScroll = 0
+    const maxScroll = scrollHeight - clientHeight
+
+    const isOnTop = scrollTop === minScroll
+    const isOnBottom = scrollTop === maxScroll
+
+    const canScroll = !(
+      (isOnTop && direction === 'up') ||
+      (isOnBottom && direction === 'down')
+    )
+
+    if (!canScroll) return setScrollDirection(null)
+    setScrollDirection(direction)
+  }, [])
+
+  useEffect(() => {
+    if (!scrollDirection) return
+
+    const scrollAmount = 2
+
+    const interval = setInterval(() => {
+      if (!containerRef.current) return
+      containerRef.current.scrollBy({
+        behavior: 'auto',
+        top: scrollDirection === 'up' ? -scrollAmount : scrollAmount
+      })
+    }, 10)
+
+    return () => clearInterval(interval)
+  }, [scrollDirection])
+
+  useEffect(() => {
+    if (!movingPadId) return setScrollDirection(null)
+  }, [movingPadId])
+
+  return (
+    <Container
+      ref={containerRef}
+      onScroll={(ev) => {
+        scrollY.current = ev.currentTarget.scrollTop
+      }}
+    >
+      {pads.map((pad) => {
+        return (
+          <Item
+            pad={pad}
+            key={pad.id.toString()}
+            onRequestScroll={handleScroll}
+            scrollY={scrollY}
+          />
+        )
+      })}
+      <div
+        onMouseMove={() => {
+          if (!movingPadId) return
+          setMovingOverPadId(pads[pads.length - 1].id)
+          setDropDirection('down')
+        }}
+        style={{ flexGrow: 1 }}
+      />
+    </Container>
+  )
+}

@@ -7,8 +7,8 @@ app.on("ready", () => {
   console.log("app is ready");
 
   const window = new BrowserWindow({
-    height: 400,
-    width: 600,
+    height: 800,
+    width: 1100,
     autoHideMenuBar: true,
   });
 
