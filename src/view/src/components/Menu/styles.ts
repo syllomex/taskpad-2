@@ -1,5 +1,11 @@
 import styled from 'styled-components'
 
+export const MenuWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`
+
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -8,6 +14,7 @@ export const Container = styled.div`
   overflow-y: auto;
   overflow-x: hidden;
   box-sizing: border-box;
+  flex: 1;
 
   &::-webkit-scrollbar {
     width: 2px;

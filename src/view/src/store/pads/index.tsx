@@ -1,6 +1,6 @@
 import { createContext, FC, useContext, useEffect, useState } from 'react'
 import { insertAfter, insertBefore } from '../../utils'
-import { FloatingName } from './floating-name'
+import { useFloatingText } from '../floating-text'
 
 import { Pad, PadsContextType } from './types'
 
@@ -9,6 +9,8 @@ export * from './types'
 const PadsContext = createContext({} as PadsContextType)
 
 export const PadsProvider: FC = ({ children }) => {
+  const { setFloatingText } = useFloatingText()
+
   const [pads, setPads] = useState<Pad[]>([
     {
       id: Math.floor(Math.random() * 16777215).toString(16),
@@ -54,97 +56,97 @@ export const PadsProvider: FC = ({ children }) => {
       id: Math.floor(Math.random() * 16777215).toString(16),
       items: [],
       title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
     }
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // },
+    // {
+    //   id: Math.floor(Math.random() * 16777215).toString(16),
+    //   items: [],
+    //   title: `Página ${Math.random()}`
+    // }
   ])
 
   const [movingPadId, setMovingPadId] = useState<string | null>(null)
@@ -197,6 +199,15 @@ export const PadsProvider: FC = ({ children }) => {
     return () => document.removeEventListener('mouseup', listener)
   }, [dropDirection, movingOverPadId, movingPadId])
 
+  useEffect(() => {
+    if (!mouseOverPadId || movingPadId) return
+
+    const pad = pads.find(({ id }) => id === mouseOverPadId)
+    if (pad) setFloatingText(pad.title)
+
+    return () => setFloatingText(null)
+  }, [mouseOverPadId, movingPadId, pads, setFloatingText])
+
   return (
     <PadsContext.Provider
       value={{
@@ -213,7 +224,6 @@ export const PadsProvider: FC = ({ children }) => {
       }}
     >
       {children}
-      <FloatingName />
     </PadsContext.Provider>
   )
 }

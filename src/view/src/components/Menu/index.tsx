@@ -9,8 +9,9 @@ import {
   useState
 } from 'react'
 import { Pad, usePads } from '../../store'
+import { BottomMenu } from '../BottomMenu'
 
-import { Circle, CircleContainer, Container } from './styles'
+import { Circle, CircleContainer, Container, MenuWrapper } from './styles'
 
 export const Item: FC<{
   pad: Pad
@@ -231,30 +232,34 @@ export const Menu: FC = () => {
   }, [movingPadId])
 
   return (
-    <Container
-      ref={containerRef}
-      onScroll={(ev) => {
-        scrollY.current = ev.currentTarget.scrollTop
-      }}
-    >
-      {pads.map((pad) => {
-        return (
-          <Item
-            pad={pad}
-            key={pad.id.toString()}
-            onRequestScroll={handleScroll}
-            scrollY={scrollY}
-          />
-        )
-      })}
-      <div
-        onMouseMove={() => {
-          if (!movingPadId) return
-          setMovingOverPadId(pads[pads.length - 1].id)
-          setDropDirection('down')
+    <MenuWrapper>
+      <Container
+        ref={containerRef}
+        onScroll={(ev) => {
+          scrollY.current = ev.currentTarget.scrollTop
         }}
-        style={{ flexGrow: 1 }}
-      />
-    </Container>
+      >
+        {pads.map((pad) => {
+          return (
+            <Item
+              pad={pad}
+              key={pad.id.toString()}
+              onRequestScroll={handleScroll}
+              scrollY={scrollY}
+            />
+          )
+        })}
+
+        <div
+          style={{ flexGrow: 1 }}
+          onMouseMove={() => {
+            if (!movingPadId) return
+            setMovingOverPadId(pads[pads.length - 1].id)
+            setDropDirection('down')
+          }}
+        />
+      </Container>
+      <BottomMenu />
+    </MenuWrapper>
   )
 }
