@@ -6,6 +6,8 @@ export const Container = styled.div`
   flex-direction: column;
   align-items: center;
 
+  width: 48px;
+
   .icon {
     cursor: pointer;
 

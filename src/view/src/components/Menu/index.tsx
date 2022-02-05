@@ -8,7 +8,7 @@ import {
   useRef,
   useState
 } from 'react'
-import { Pad, usePads } from '../../store'
+import { Pad, useConfirm, usePads } from '../../store'
 import { BottomMenu } from '../BottomMenu'
 
 import { Circle, CircleContainer, Container, MenuWrapper } from './styles'
@@ -20,6 +20,8 @@ export const Item: FC<{
 }> = ({ pad, onRequestScroll, scrollY }) => {
   const ref = useRef<HTMLDivElement>(null)
 
+  const { confirm } = useConfirm()
+
   const {
     pads,
     movingPadId,
@@ -28,7 +30,8 @@ export const Item: FC<{
     setMovingOverPadId,
     dropDirection,
     setDropDirection,
-    setMouseOverPadId
+    setMouseOverPadId,
+    deletePad
   } = usePads()
 
   const isMoving = movingPadId === pad.id
@@ -158,6 +161,14 @@ export const Item: FC<{
     setMovingOverPadId
   ])
 
+  const handleDeletePad = useCallback(() => {
+    confirm({
+      title: 'Excluir página',
+      description: 'Tem certeza de que deseja excluir essa página?',
+      onConfirm: () => deletePad(pad.id)
+    })
+  }, [confirm, deletePad, pad.id])
+
   return (
     <CircleContainer
       ref={ref}
@@ -171,11 +182,9 @@ export const Item: FC<{
       }}
       onMouseEnter={() => setMouseOverPadId(pad.id)}
       onMouseLeave={() => setMouseOverPadId(null)}
+      onContextMenu={handleDeletePad}
     >
-      <Circle
-        className={className}
-        style={{ backgroundColor: `#${pad.id}66` }}
-      />
+      <Circle className={className} />
     </CircleContainer>
   )
 }

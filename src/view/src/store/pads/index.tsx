@@ -1,4 +1,13 @@
-import { createContext, FC, useContext, useEffect, useState } from 'react'
+import {
+  createContext,
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useState
+} from 'react'
+import { v4 } from 'uuid'
+
 import { insertAfter, insertBefore } from '../../utils'
 import { useFloatingText } from '../floating-text'
 
@@ -11,143 +20,7 @@ const PadsContext = createContext({} as PadsContextType)
 export const PadsProvider: FC = ({ children }) => {
   const { setFloatingText } = useFloatingText()
 
-  const [pads, setPads] = useState<Pad[]>([
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    },
-    {
-      id: Math.floor(Math.random() * 16777215).toString(16),
-      items: [],
-      title: `Página ${Math.random()}`
-    }
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // },
-    // {
-    //   id: Math.floor(Math.random() * 16777215).toString(16),
-    //   items: [],
-    //   title: `Página ${Math.random()}`
-    // }
-  ])
+  const [pads, setPads] = useState<Pad[]>([])
 
   const [movingPadId, setMovingPadId] = useState<string | null>(null)
   const [movingOverPadId, setMovingOverPadId] = useState<string | null>(null)
@@ -230,5 +103,19 @@ export const PadsProvider: FC = ({ children }) => {
 
 export const usePads = () => {
   const context = useContext(PadsContext)
-  return context
+
+  const { setPads } = context
+
+  const createPad = useCallback(() => {
+    setPads((cur) => [...cur, { id: v4(), items: [], title: 'Nova página' }])
+  }, [setPads])
+
+  const deletePad = useCallback(
+    (id: string) => {
+      setPads((cur) => cur.filter((pad) => pad.id !== id))
+    },
+    [setPads]
+  )
+
+  return { ...context, createPad, deletePad }
 }
