@@ -70,7 +70,8 @@ export const usePad = () => {
       const newLine: Line = {
         id: v4(),
         text,
-        type: 'line'
+        type: 'line',
+        checked: false
       }
 
       updateContent(id, !content ? [newLine] : [...content.items, newLine])
@@ -90,12 +91,31 @@ export const usePad = () => {
     [content?.items, id, updateContent]
   )
 
+  const updateLine = useCallback(
+    (data: Line) => {
+      if (!id) return
+      const lineIndex = content?.items.findIndex((item) => item.id === data.id)
+      const updated =
+        !content || lineIndex === undefined || lineIndex === -1
+          ? [data]
+          : [
+              ...[...content.items].splice(0, lineIndex),
+              data,
+              ...[...content.items].splice(lineIndex + 1)
+            ]
+
+      updateContent(id, updated)
+    },
+    [content, id, updateContent]
+  )
+
   return {
     pad,
     updateTitle,
     content,
     updateContent,
     createLine,
-    deleteLine
+    deleteLine,
+    updateLine
   }
 }

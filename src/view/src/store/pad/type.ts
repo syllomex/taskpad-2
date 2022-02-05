@@ -2,6 +2,7 @@ export interface Line {
   type: 'line'
   id: string
   text: string
+  checked: boolean
 }
 
 export interface Category {

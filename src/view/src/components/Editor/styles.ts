@@ -17,14 +17,12 @@ export const Container = styled.div`
   ::-webkit-scrollbar {
     width: 0;
   }
-
 `
 
 export const ContentContainer = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-
 `
 
 export const TitleHeading = styled.h1`
@@ -53,9 +51,15 @@ export const TextEditor = styled.div`
   padding: 0 16px;
 `
 
-export const LineContainer = styled.div`
+export const LineContainer = styled.div<{ checked: boolean }>`
   padding: 8px 16px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+
+  transition-duration: 0.2s;
+
+  ${({ checked }) => checked && 'text-decoration: line-through; opacity: 0.7;'}
 
   &:hover {
     background-color: var(--color-background-dark);
