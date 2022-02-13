@@ -1,14 +1,20 @@
-import { FC, KeyboardEvent, useCallback, useRef, useState } from 'react'
+import { FC, KeyboardEvent, useCallback, useState } from 'react'
 
 import { usePad } from '../../store/pad'
+import { useKeyHandlers } from '../../utils/key-handlers'
 import { TitleHeading } from './styles'
 
 export const Title: FC = () => {
-  const titleRef = useRef<HTMLHeadingElement>(null)
-
   const [isEditing, setIsEditing] = useState(false)
 
-  const { updateTitle, pad, unselectItem } = usePad()
+  const {
+    updateTitle,
+    pad,
+    unselectItem,
+    titleRef,
+    selectFirstItem,
+    selectTextEditor
+  } = usePad()
 
   const handleFocus = useCallback(() => {
     setIsEditing(true)
@@ -22,7 +28,7 @@ export const Title: FC = () => {
     const text = titleRef.current.innerText.trim()
     if (text.length) updateTitle(text)
     else titleRef.current.innerText = pad?.title
-  }, [pad, updateTitle])
+  }, [pad, titleRef, updateTitle])
 
   const handleKeyPress = useCallback(
     (ev: KeyboardEvent<HTMLHeadingElement>) => {
@@ -31,8 +37,17 @@ export const Title: FC = () => {
         titleRef.current?.blur()
       }
     },
-    []
+    [titleRef]
   )
+
+  useKeyHandlers({
+    disabled: !isEditing,
+    arrowDown (ev) {
+      ev.preventDefault()
+      if (selectFirstItem()) titleRef.current?.blur()
+      else selectTextEditor()
+    }
+  })
 
   return (
     <TitleHeading

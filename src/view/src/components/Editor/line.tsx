@@ -17,7 +17,8 @@ export const LineComponent: FC<{ line: Line }> = ({ line }) => {
     setSelectedItemId,
     selectedItemId,
     selectPreviousItem,
-    selectNextItem
+    selectNextItem,
+    selectTextEditor
   } = usePad()
 
   const handleDelete = useCallback(() => {
@@ -51,7 +52,10 @@ export const LineComponent: FC<{ line: Line }> = ({ line }) => {
     enter (ev) {
       ev.preventDefault()
       if (!isEditing) spanRef.current?.focus()
-      else spanRef.current?.blur()
+      else {
+        spanRef.current?.blur()
+        selectTextEditor()
+      }
     },
     del () {
       if (!isEditing) handleDelete()
@@ -90,7 +94,10 @@ export const LineComponent: FC<{ line: Line }> = ({ line }) => {
 
   return (
     <LineContainer
-      onContextMenu={handleDelete}
+      onContextMenu={(ev) => {
+        ev.preventDefault()
+        handleDelete()
+      }}
       checked={line.checked}
       onClick={handleClick}
       selected={selectedItemId === line.id}

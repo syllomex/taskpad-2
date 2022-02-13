@@ -1,4 +1,13 @@
-import { createContext, FC, useCallback, useContext, useState } from 'react'
+import {
+  createContext,
+  FC,
+  RefObject,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from 'react'
 import { v4 } from 'uuid'
 import { replaceIndex, SetState } from '../../utils'
 import { Pad, usePads } from '../pads'
@@ -16,10 +25,15 @@ export const PadContext = createContext(
     padContentIndex: number
     selectedPadIndex: number
     selectedItemIndex: number
+    textEditorRef: RefObject<HTMLDivElement>
+    titleRef: RefObject<HTMLHeadingElement>
   }
 )
 
 export const PadProvider: FC = ({ children }) => {
+  const textEditorRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLHeadingElement>(null)
+
   const [contents, setContents] = useState<PadContent[]>([])
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
 
@@ -51,7 +65,9 @@ export const PadProvider: FC = ({ children }) => {
         selectedPad,
         selectedPadIndex,
         padContent,
-        padContentIndex
+        padContentIndex,
+        textEditorRef,
+        titleRef
       }}
     >
       {children}
@@ -107,23 +123,67 @@ export const usePad = () => {
     [contentIndex, padId, setContents]
   )
 
-  const selectNextItem = useCallback(() => {
+  const unselectItem = useCallback(
+    () => setSelectedItemId(null),
+    [setSelectedItemId]
+  )
+
+  const selectTitle = useCallback(() => {
+    context.titleRef.current?.focus()
+    unselectItem()
+  }, [context.titleRef, unselectItem])
+
+  const selectTextEditor = useCallback(() => {
+    context.textEditorRef.current?.focus()
+  }, [context.textEditorRef])
+
+  const selectNextItem = useCallback(
+    (preventEditorSelect?: boolean) => {
+      if (!content) {
+        selectTextEditor()
+        return false
+      }
+      const isLast = selectedItemIndex === content.items.length - 1
+      if (selectedItemIndex === -1 || isLast) {
+        if (!preventEditorSelect) selectTextEditor()
+        return false
+      }
+
+      setSelectedItemId(content.items[selectedItemIndex + 1].id)
+      return true
+    },
+    [content, selectTextEditor, selectedItemIndex, setSelectedItemId]
+  )
+
+  const selectPreviousItem = useCallback(
+    (preventTitleSelect?: boolean) => {
+      if (!content) return false
+      const isFirst = selectedItemIndex === 0
+      if (isFirst) {
+        if (!preventTitleSelect) selectTitle()
+        return false
+      }
+      if (selectedItemIndex === -1) return false
+
+      setSelectedItemId(content.items[selectedItemIndex - 1].id)
+      return true
+    },
+    [content, selectTitle, selectedItemIndex, setSelectedItemId]
+  )
+
+  const selectLastItem = useCallback(() => {
     if (!content) return false
-    const isLast = selectedItemIndex === content.items.length - 1
-    if (selectedItemIndex === -1 || isLast) return false
-
-    setSelectedItemId(content.items[selectedItemIndex + 1].id)
+    if (!content.items.length) return false
+    setSelectedItemId(content.items[content.items.length - 1].id)
     return true
-  }, [content, selectedItemIndex, setSelectedItemId])
+  }, [content, setSelectedItemId])
 
-  const selectPreviousItem = useCallback(() => {
+  const selectFirstItem = useCallback(() => {
     if (!content) return false
-    const isFirst = selectedItemIndex === 0
-    if (selectedItemIndex === -1 || isFirst) return false
-
-    setSelectedItemId(content.items[selectedItemIndex - 1].id)
+    if (!content.items.length) return false
+    setSelectedItemId(content.items[0].id)
     return true
-  }, [content, selectedItemIndex, setSelectedItemId])
+  }, [content, setSelectedItemId])
 
   const createLine = useCallback(
     (text: string) => {
@@ -144,7 +204,7 @@ export const usePad = () => {
   const deleteLine = useCallback(
     (lineId: string) => {
       if (!padId) return
-      if (!selectNextItem()) selectPreviousItem()
+      if (!selectNextItem(true)) selectPreviousItem(true)
       updateContent(content?.items.filter((item) => item.id !== lineId) || [])
     },
     [content?.items, padId, selectNextItem, selectPreviousItem, updateContent]
@@ -168,10 +228,9 @@ export const usePad = () => {
     [content, padId, updateContent]
   )
 
-  const unselectItem = useCallback(
-    () => setSelectedItemId(null),
-    [setSelectedItemId]
-  )
+  useEffect(() => {
+    if (padId) selectTextEditor()
+  }, [padId, selectTextEditor])
 
   return {
     ...context,
@@ -184,6 +243,10 @@ export const usePad = () => {
     updateLine,
     unselectItem,
     selectNextItem,
-    selectPreviousItem
+    selectPreviousItem,
+    selectFirstItem,
+    selectLastItem,
+    selectTitle,
+    selectTextEditor
   }
 }

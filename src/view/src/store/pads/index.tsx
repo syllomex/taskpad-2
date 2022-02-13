@@ -107,7 +107,35 @@ export const PadsProvider: FC = ({ children }) => {
 export const usePads = () => {
   const context = useContext(PadsContext)
 
-  const { setPads } = context
+  const { pads, setPads, setSelectedPadId, selectedPadId } = context
+
+  const selectNextPad = useCallback(() => {
+    if (!selectedPadId) return false
+
+    const currentIndex = pads.findIndex(({ id }) => id === selectedPadId)
+    const notFound = currentIndex === -1
+    const isLast = currentIndex === pads.length - 1
+
+    if (notFound || isLast) return false
+
+    setSelectedPadId(pads[currentIndex + 1].id)
+
+    return true
+  }, [pads, selectedPadId, setSelectedPadId])
+
+  const selectPreviousPad = useCallback(() => {
+    if (!selectedPadId) return false
+
+    const currentIndex = pads.findIndex(({ id }) => id === selectedPadId)
+    const notFound = currentIndex === -1
+    const isFirst = currentIndex === 0
+
+    if (notFound || isFirst) return false
+
+    setSelectedPadId(pads[currentIndex - 1].id)
+
+    return true
+  }, [pads, selectedPadId, setSelectedPadId])
 
   const createPad = useCallback(() => {
     const id = v4()
@@ -118,8 +146,9 @@ export const usePads = () => {
   const deletePad = useCallback(
     (id: string) => {
       setPads((cur) => cur.filter((pad) => pad.id !== id))
+      if (id === selectedPadId) selectNextPad() || selectPreviousPad()
     },
-    [setPads]
+    [selectNextPad, selectPreviousPad, selectedPadId, setPads]
   )
 
   return {

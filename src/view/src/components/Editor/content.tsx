@@ -1,12 +1,17 @@
-import { FC, useRef } from 'react'
+import { FC } from 'react'
 import { usePad } from '../../store'
 import { LineComponent } from './line'
 import { ContentContainer, TextEditor } from './styles'
 
 export const Content: FC = () => {
-  const editorRef = useRef<HTMLDivElement>(null)
-
-  const { content, createLine, unselectItem } = usePad()
+  const {
+    content,
+    createLine,
+    unselectItem,
+    textEditorRef: editorRef,
+    selectLastItem,
+    selectTitle
+  } = usePad()
 
   return (
     <ContentContainer>
@@ -35,8 +40,13 @@ export const Content: FC = () => {
             const text = ev.currentTarget.innerText.trim()
             if (text.length) createLine(text)
             ev.currentTarget.innerText = ''
+          } else if (ev.code === 'ArrowUp') {
+            ev.preventDefault()
+            if (selectLastItem()) editorRef.current?.blur()
+            else selectTitle()
           }
         }}
+        onFocus={unselectItem}
         onClick={unselectItem}
       />
     </ContentContainer>
