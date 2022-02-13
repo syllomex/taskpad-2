@@ -73,4 +73,15 @@ export const LineContainer = styled.div<{
   &:hover {
     background-color: var(--color-background-dark);
   }
+
+  @keyframes fade-in {
+    from {
+      transform: scaleY(0.8);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  animation: fade-in 0.4s;
 `
