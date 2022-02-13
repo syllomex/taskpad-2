@@ -42,7 +42,8 @@ export const ConfirmProvider: FC = ({ children }) => {
     if (!props) return
 
     const keyListener = (e: KeyboardEvent) => {
-      if (e.key.toUpperCase() === 'S') handleConfirm()
+      e.preventDefault()
+      if (e.key.toUpperCase() === 'S' || e.key === 'Enter') handleConfirm()
       else if (e.key.toUpperCase() === 'N' || e.key === 'Escape') handleCancel()
     }
 

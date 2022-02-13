@@ -2,13 +2,14 @@ import {
   DragEvent,
   FC,
   MutableRefObject,
+  RefObject,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState
 } from 'react'
-import { Pad, useConfirm, usePads } from '../../store'
+import { Pad, useConfirm, usePad, usePads } from '../../store'
 import { BottomMenu } from '../BottomMenu'
 
 import { Circle, CircleContainer, Container, MenuWrapper } from './styles'
@@ -16,8 +17,9 @@ import { Circle, CircleContainer, Container, MenuWrapper } from './styles'
 export const Item: FC<{
   pad: Pad
   onRequestScroll(direction: 'up' | 'down' | null): void
+  containerRef: RefObject<HTMLDivElement>
   scrollY: MutableRefObject<number>
-}> = ({ pad, onRequestScroll, scrollY }) => {
+}> = ({ pad, onRequestScroll, scrollY, containerRef }) => {
   const ref = useRef<HTMLDivElement>(null)
 
   const { confirm } = useConfirm()
@@ -35,6 +37,8 @@ export const Item: FC<{
     selectPad,
     selectedPadId
   } = usePads()
+
+  const { unselectItem } = usePad()
 
   const isMovingOther = movingPadId && movingPadId !== pad.id
 
@@ -134,7 +138,10 @@ export const Item: FC<{
 
       if (clientY < scrollThreshold) {
         onRequestScroll('up')
-      } else if (clientY > document.body.clientHeight - scrollThreshold) {
+      } else if (
+        containerRef.current &&
+        clientY > containerRef.current?.clientHeight - scrollThreshold
+      ) {
         onRequestScroll('down')
       } else {
         onRequestScroll(null)
@@ -154,6 +161,7 @@ export const Item: FC<{
       setMovingOverPadId(pad.id)
     }
   }, [
+    containerRef,
     movingPadId,
     onRequestScroll,
     pad.id,
@@ -184,7 +192,10 @@ export const Item: FC<{
       onMouseEnter={() => setMouseOverPadId(pad.id)}
       onMouseLeave={() => setMouseOverPadId(null)}
       onContextMenu={handleDeletePad}
-      onClick={() => selectPad(pad.id)}
+      onClick={() => {
+        selectPad(pad.id)
+        unselectItem()
+      }}
     >
       <Circle className={className} />
     </CircleContainer>
@@ -257,6 +268,7 @@ export const Menu: FC = () => {
               key={pad.id.toString()}
               onRequestScroll={handleScroll}
               scrollY={scrollY}
+              containerRef={containerRef}
             />
           )
         })}

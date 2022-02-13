@@ -9,7 +9,7 @@ interface Props {
 
 export const CheckBox: FC<Props> = ({ checked, onChange }) => {
   return (
-    <Container onClick={() => onChange?.(!checked)}>
+    <Container onClick={() => onChange?.(!checked)} itemType="checkbox">
       {checked && <IoCheckmark className="icon" />}
     </Container>
   )

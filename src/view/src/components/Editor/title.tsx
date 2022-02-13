@@ -8,7 +8,12 @@ export const Title: FC = () => {
 
   const [isEditing, setIsEditing] = useState(false)
 
-  const { updateTitle, pad } = usePad()
+  const { updateTitle, pad, unselectItem } = usePad()
+
+  const handleFocus = useCallback(() => {
+    setIsEditing(true)
+    unselectItem()
+  }, [unselectItem])
 
   const handleBlur = useCallback(() => {
     setIsEditing(false)
@@ -33,7 +38,7 @@ export const Title: FC = () => {
     <TitleHeading
       ref={titleRef}
       className={`title${isEditing ? ' editing' : ''}`}
-      onFocus={() => setIsEditing(true)}
+      onFocus={handleFocus}
       onBlur={handleBlur}
       contentEditable
       suppressContentEditableWarning

@@ -4,7 +4,6 @@ export const Container = styled.div`
   color: var(--color-regular);
   width: 90%;
   margin: 0 auto;
-  user-select: none;
   padding: 32px 0 0;
 
   display: flex;
@@ -51,15 +50,25 @@ export const TextEditor = styled.div`
   padding: 0 16px;
 `
 
-export const LineContainer = styled.div<{ checked: boolean }>`
+export const LineContainer = styled.div<{
+  checked: boolean
+  selected: boolean
+}>`
   padding: 8px 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
-
   transition-duration: 0.2s;
+  outline: 0;
+
+  span {
+    flex: 1;
+    outline: 0;
+  }
 
   ${({ checked }) => checked && 'text-decoration: line-through; opacity: 0.7;'}
+  ${({ selected }) =>
+    selected && 'background-color: var(--color-background-dark);'}
 
   &:hover {
     background-color: var(--color-background-dark);

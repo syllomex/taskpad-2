@@ -29,3 +29,15 @@ export const insertAfter = <T = any>({
     ...[...array].splice(afterIndex + 1)
   ]
 }
+
+export const replaceIndex = <T = any>({
+  array,
+  item,
+  index
+}: {
+  array: T[]
+  item: T
+  index: number
+}) => {
+  return [...[...array].splice(0, index), item, ...[...array].splice(index + 1)]
+}

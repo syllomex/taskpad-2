@@ -6,7 +6,7 @@ import { ContentContainer, TextEditor } from './styles'
 export const Content: FC = () => {
   const editorRef = useRef<HTMLDivElement>(null)
 
-  const { content, createLine } = usePad()
+  const { content, createLine, unselectItem } = usePad()
 
   return (
     <ContentContainer>
@@ -37,6 +37,7 @@ export const Content: FC = () => {
             ev.currentTarget.innerText = ''
           }
         }}
+        onClick={unselectItem}
       />
     </ContentContainer>
   )
