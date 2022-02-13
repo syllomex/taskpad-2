@@ -57,9 +57,12 @@ export const LineContainer = styled.div<{
   padding: 8px 16px;
   cursor: pointer;
   display: flex;
-  align-items: center;
   transition-duration: 0.2s;
   outline: 0;
+
+  .checkbox-container {
+    margin-top: 2.25px;
+  }
 
   span {
     flex: 1;
