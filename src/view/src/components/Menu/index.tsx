@@ -1,6 +1,7 @@
 import {
   DragEvent,
   FC,
+  MouseEvent,
   MutableRefObject,
   RefObject,
   useCallback,
@@ -170,13 +171,17 @@ export const Item: FC<{
     setMovingOverPadId
   ])
 
-  const handleDeletePad = useCallback(() => {
-    confirm({
-      title: 'Excluir página',
-      description: 'Tem certeza de que deseja excluir essa página?',
-      onConfirm: () => deletePad(pad.id)
-    })
-  }, [confirm, deletePad, pad.id])
+  const handleDeletePad = useCallback(
+    (ev: MouseEvent<HTMLDivElement>) => {
+      ev.preventDefault()
+      confirm({
+        title: 'Excluir página',
+        description: 'Tem certeza de que deseja excluir essa página?',
+        onConfirm: () => deletePad(pad.id)
+      })
+    },
+    [confirm, deletePad, pad.id]
+  )
 
   return (
     <CircleContainer
