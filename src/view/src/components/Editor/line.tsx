@@ -46,8 +46,11 @@ export const LineComponent: FC<{ line: Line }> = ({ line }) => {
     escape () {
       spanRef.current?.blur()
     },
-    space () {
-      if (!isEditing) handleCheck(!line.checked)
+    space (ev) {
+      if (!isEditing) {
+        ev.preventDefault()
+        handleCheck(!line.checked)
+      }
     },
     enter (ev) {
       ev.preventDefault()
@@ -102,7 +105,9 @@ export const LineComponent: FC<{ line: Line }> = ({ line }) => {
       onClick={handleClick}
       selected={selectedItemId === line.id}
     >
-      <CheckBox checked={line.checked} onChange={handleCheck} />
+      <div className="checkbox-container">
+        <CheckBox checked={line.checked} onChange={handleCheck} />
+      </div>
       <span
         ref={spanRef}
         contentEditable={selectedItemId === line.id}
