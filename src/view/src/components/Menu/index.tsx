@@ -61,6 +61,7 @@ export const Item: FC<{
     } else if (mouseOverIndex === movingIndex - 1 && shouldDropBelow) {
       return
     } else if (mouseOverIndex === movingIndex + 1 && shouldDropAbove) {
+      ref.current.style.transform = 'translateY(0px)'
       return
     }
 
@@ -78,6 +79,8 @@ export const Item: FC<{
       } else if (mouseOverIndex > movingIndex && shouldDropAbove) {
         const diff = mouseOverIndex - movingIndex
         ref.current.style.transform = `translateY(${(diff - 1) * 40}px)`
+      } else {
+        ref.current.style.transform = 'translateY(0px)'
       }
     } else {
       // MOVING CIRCLE UP
