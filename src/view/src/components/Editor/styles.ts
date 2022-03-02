@@ -2,9 +2,9 @@ import styled from 'styled-components'
 
 export const Container = styled.div`
   color: var(--color-regular);
-  width: 90%;
+  width: 100%;
   margin: 0 auto;
-  padding: 32px 0 0;
+  padding: 32px 5% 0;
 
   display: flex;
   flex-direction: column;
@@ -13,8 +13,17 @@ export const Container = styled.div`
     transition-duration: 0.2s;
   }
   overflow-y: auto;
-  ::-webkit-scrollbar {
-    width: 0;
+  &::-webkit-scrollbar {
+    width: 2px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary);
+    &:hover {
+      background-color: var(--color-primary-transparent-1);
+    }
+    &:active {
+      background-color: var(--color-primary-transparent-2);
+    }
   }
 `
 
