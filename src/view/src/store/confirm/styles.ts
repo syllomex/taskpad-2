@@ -15,6 +15,8 @@ export const Wrapper = styled.div`
   color: var(--color-regular);
 
   z-index: 100;
+
+  animation: fade-in .2s;
 `
 
 export const Backdrop = styled.div`
