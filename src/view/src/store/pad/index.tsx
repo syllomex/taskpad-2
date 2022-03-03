@@ -1,6 +1,7 @@
 import {
   createContext,
   FC,
+  MutableRefObject,
   RefObject,
   useCallback,
   useContext,
@@ -9,9 +10,9 @@ import {
   useState
 } from 'react'
 import { v4 } from 'uuid'
-import { replaceIndex, SetState } from '../../utils'
+import { insertAfter, insertBefore, replaceIndex, SetState } from '../../utils'
 import { Pad, usePads } from '../pads'
-import { Item, Line, PadContent } from './type'
+import { Item, ItemHeight, Line, PadContent } from './type'
 
 export const PadContext = createContext(
   {} as {
@@ -27,6 +28,16 @@ export const PadContext = createContext(
     selectedItemIndex: number
     textEditorRef: RefObject<HTMLDivElement>
     titleRef: RefObject<HTMLHeadingElement>
+    movingItemId: string | null
+    setMovingItemId: SetState<string | null>
+    movingOverItemId: string | null
+    setMovingOverItemId: SetState<string | null>
+    dropDirection: 'up' | 'down' | null
+    setDropDirection: SetState<'up' | 'down' | null>
+    scrollY: MutableRefObject<number>
+    containerRef: RefObject<HTMLDivElement>
+    heights: ItemHeight[]
+    setHeights: SetState<ItemHeight[]>
   }
 )
 
@@ -53,6 +64,14 @@ export const PadProvider: FC = ({ children }) => {
 
   const selectedItem = padContent?.items[selectedItemIndex] || null
 
+  /** DRAG AND DORP */
+  const [movingItemId, setMovingItemId] = useState<string | null>(null)
+  const [movingOverItemId, setMovingOverItemId] = useState<string | null>(null)
+  const [dropDirection, setDropDirection] = useState<'up' | 'down' | null>(null)
+  const scrollY = useRef(0)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [heights, setHeights] = useState<ItemHeight[]>([])
+
   return (
     <PadContext.Provider
       value={{
@@ -67,7 +86,17 @@ export const PadProvider: FC = ({ children }) => {
         padContent,
         padContentIndex,
         textEditorRef,
-        titleRef
+        titleRef,
+        movingItemId,
+        setMovingItemId,
+        movingOverItemId,
+        setMovingOverItemId,
+        dropDirection,
+        setDropDirection,
+        scrollY,
+        containerRef,
+        heights,
+        setHeights
       }}
     >
       {children}
@@ -85,7 +114,9 @@ export const usePad = () => {
     padContentIndex: contentIndex,
     padContent: content,
     setSelectedItemId,
-    selectedItemIndex
+    selectedItemIndex,
+    heights,
+    setHeights
   } = context
 
   const { setPads, selectedPadId: padId } = usePads()
@@ -232,6 +263,131 @@ export const usePad = () => {
     if (padId) selectTextEditor()
   }, [padId, selectTextEditor])
 
+  const setItemHeight = useCallback(
+    (id: string, height: number) => {
+      setHeights((cur) => {
+        const index = cur.findIndex(({ itemId }) => itemId === id)
+        if (index === -1) return [...cur, { itemId: id, height }]
+
+        return replaceIndex({ array: cur, index, item: { itemId: id, height } })
+      })
+    },
+    [setHeights]
+  )
+
+  const getItemHeight = useCallback(
+    (id: string) => {
+      return heights.find((item) => item.itemId === id) as ItemHeight
+    },
+    [heights]
+  )
+
+  const getItemHeightsBeforeId = useCallback(
+    (id: string) => {
+      if (!content) return null
+      const idIndex = content.items.findIndex(({ id: _id }) => _id === id)
+      if (idIndex === -1) return null
+
+      const itemIdsBeforeIndex = content.items
+        .filter((_, index) => index < idIndex)
+        .map((item) => item.id)
+
+      return heights.reduce((prev, item) => {
+        if (!itemIdsBeforeIndex.includes(item.itemId)) return prev
+        return prev + item.height
+      }, 0)
+    },
+    [content, heights]
+  )
+
+  const getItemHeightsAfterId = useCallback(
+    (id: string) => {
+      if (!content) return null
+      const idIndex = content.items.findIndex(({ id: _id }) => _id === id)
+      if (idIndex === -1) return null
+
+      const itemIdsAfterIndex = content.items
+        .filter((_, index) => index > idIndex)
+        .map((item) => item.id)
+
+      return heights.reduce((prev, item) => {
+        if (!itemIdsAfterIndex.includes(item.itemId)) return prev
+        return prev + item.height
+      }, 0)
+    },
+    [content, heights]
+  )
+
+  const moveIdToAbove = useCallback(
+    (itemId: string, aboveId: string) => {
+      const items = content?.items
+      if (!items) return
+
+      const movingItem = items.find((item) => item.id === itemId)
+      const itemsWithoutMovingId = items.filter((item) => item.id !== itemId)
+      const beforeIndex = itemsWithoutMovingId.findIndex(
+        (item) => item.id === aboveId
+      )
+
+      if (beforeIndex === -1 || !movingItem) return
+
+      const updated = insertBefore({
+        array: itemsWithoutMovingId,
+        beforeIndex,
+        element: movingItem
+      })
+
+      updateContent(updated)
+    },
+    [content?.items, updateContent]
+  )
+
+  const moveIdToBelow = useCallback(
+    (itemId: string, belowId: string) => {
+      const items = content?.items
+      if (!items) return
+
+      const movingItem = items.find((item) => item.id === itemId)
+      const itemsWithoutMovingId = items.filter((item) => item.id !== itemId)
+      const afterIndex = itemsWithoutMovingId.findIndex(
+        (item) => item.id === belowId
+      )
+
+      if (afterIndex === -1 || !movingItem) return
+
+      const updated = insertAfter({
+        array: itemsWithoutMovingId,
+        afterIndex,
+        element: movingItem
+      })
+
+      updateContent(updated)
+    },
+    [content?.items, updateContent]
+  )
+
+  const getHeightBetweenIndexes = useCallback(
+    (startIndex: number, endIndex: number) => {
+      const items = content?.items
+      if (!items) return
+
+      const getHeightFromIds = items
+        .filter((_item, index) => {
+          return index > startIndex && index < endIndex
+        })
+        .map(({ id }) => id)
+
+      const heights = context.heights.filter(({ itemId }) =>
+        getHeightFromIds.includes(itemId)
+      )
+
+      return heights.reduce((prev, item) => {
+        return prev + item.height
+      }, 0)
+    },
+    [content?.items, context.heights]
+  )
+
   return {
     ...context,
     pad,
@@ -247,6 +403,13 @@ export const usePad = () => {
     selectFirstItem,
     selectLastItem,
     selectTitle,
-    selectTextEditor
+    selectTextEditor,
+    getItemHeight,
+    setItemHeight,
+    getItemHeightsBeforeId,
+    getItemHeightsAfterId,
+    moveIdToAbove,
+    moveIdToBelow,
+    getHeightBetweenIndexes
   }
 }

@@ -6,6 +6,7 @@ type Handlers = {
   escape?: (ev: KeyboardEvent) => void
   space?: (ev: KeyboardEvent) => void
   enter?: (ev: KeyboardEvent) => void
+  shiftEnter?: (ev: KeyboardEvent) => void
   arrowUp?: (ev: KeyboardEvent) => void
   arrowDown?: (ev: KeyboardEvent) => void
   keyOrDigit?: (ev: KeyboardEvent) => void
@@ -18,6 +19,7 @@ export const useKeyHandlers = ({
   arrowDown,
   arrowUp,
   enter,
+  shiftEnter,
   del,
   keyOrDigit,
   escape,
@@ -31,8 +33,10 @@ export const useKeyHandlers = ({
         escape?.(ev)
       } else if (ev.code === 'Space') {
         space?.(ev)
-      } else if (ev.key === 'Enter') {
+      } else if (ev.key === 'Enter' && !ev.shiftKey) {
         enter?.(ev)
+      } else if (ev.key === 'Enter' && ev.shiftKey) {
+        shiftEnter?.(ev)
       } else if (ev.code === 'Delete') {
         del?.(ev)
       } else if (ev.code === 'ArrowUp') {
@@ -46,5 +50,15 @@ export const useKeyHandlers = ({
 
     document.addEventListener('keydown', listener)
     return () => document.removeEventListener('keydown', listener)
-  }, [arrowDown, arrowUp, del, disabled, enter, escape, keyOrDigit, space])
+  }, [
+    arrowDown,
+    arrowUp,
+    shiftEnter,
+    del,
+    disabled,
+    enter,
+    escape,
+    keyOrDigit,
+    space
+  ])
 }

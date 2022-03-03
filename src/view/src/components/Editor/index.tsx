@@ -5,12 +5,18 @@ import { Container } from './styles'
 import { Title } from './title'
 
 export const Editor: FC = () => {
-  const { pad } = usePad()
+  const { pad, scrollY, containerRef, movingItemId } = usePad()
 
   if (!pad) return null
 
   return (
-    <Container>
+    <Container
+      ref={containerRef}
+      withTransition={!!movingItemId}
+      onScroll={(ev) => {
+        scrollY.current = ev.currentTarget.scrollTop
+      }}
+    >
       <Title />
       <Content />
     </Container>

@@ -17,3 +17,8 @@ export interface PadContent {
   padId: string
   items: Item[]
 }
+
+export interface ItemHeight {
+  itemId: string
+  height: number
+}

@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
 import { usePad } from '../../store'
 import { LineComponent } from './line'
 import { ContentContainer, TextEditor } from './styles'
@@ -10,11 +10,17 @@ export const Content: FC = () => {
     unselectItem,
     textEditorRef: editorRef,
     selectLastItem,
-    selectTitle
+    selectTitle,
+    movingItemId,
+    selectedItemId
   } = usePad()
 
+  useEffect(() => {
+    if (selectedItemId || movingItemId) editorRef.current?.blur()
+  }, [editorRef, movingItemId, selectedItemId])
+
   return (
-    <ContentContainer>
+    <ContentContainer isMoving={!!movingItemId}>
       {content?.items.map((item) => {
         if (item.type === 'line') {
           return <LineComponent key={item.id} line={item} />
@@ -35,7 +41,7 @@ export const Content: FC = () => {
         contentEditable
         suppressContentEditableWarning
         onKeyDown={(ev) => {
-          if (ev.key === 'Enter') {
+          if (ev.key === 'Enter' && !ev.shiftKey) {
             ev.preventDefault()
             const text = ev.currentTarget.innerText.trim()
             if (text.length) createLine(text)

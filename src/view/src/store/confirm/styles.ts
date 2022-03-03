@@ -16,7 +16,16 @@ export const Wrapper = styled.div`
 
   z-index: 100;
 
-  animation: fade-in .2s;
+  @keyframes fade {
+    from {
+      opacity: 0
+    }
+    to {
+      opacity: 1
+    }
+  }
+
+  animation: fade .2s;
 `
 
 export const Backdrop = styled.div`
